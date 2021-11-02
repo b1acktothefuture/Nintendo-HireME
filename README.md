@@ -40,10 +40,10 @@ Other relevent observations I have made are in the explore directory.
 ## Solution
 There are two main parts to the solution:
 - part A: Inverting the Substitution Permutation loop
-<br>
+
 ```bool ConfuseAndDiffuse(u8 input[32], u32 iterNum);```
 - part B: Unscrambling the final result.
-<br>
+
 ```bool scramble(u8 input[16], u8 find[32], u32 level);```
 
 ### Compile and Run
