@@ -7,9 +7,10 @@ using namespace std;
 typedef unsigned char u8;
 typedef unsigned int u32;
 
-//------------------------------------------------
+int MAXITER = 256;
+bool confuse(u8 input[32], u8 reuse[32], u8 current, u32 iterNum);
 
-u8 MAXITER = 256;
+//------------------------------------------------
 
 u8 confusion[512] = {
     0xac, 0xd1, 0x25, 0x94, 0x1f, 0xb3, 0x33, 0x28, 0x7c, 0x2b, 0x17, 0xbc, 0xf6, 0xb0, 0x55, 0x5d,
@@ -51,6 +52,8 @@ u32 diffusion[32] = {
     0xb481f26c, 0xdc9216a5, 0xa9243c5b, 0x524879b6, 0x4b182fc6, 0xcd29615a, 0x9a42c3b5, 0x2584976b,
     0x81b46cf2, 0x92dca516, 0x24a95b3c, 0x4852b679, 0x184bc62f, 0x29cd5a61, 0x429ab5c3, 0x84256b97};
 
+//------------------------------------------------
+
 static u32 diffusioninv[32] = {
     4067210369, 379968658, 1012640036, 2041991752, 801524504, 1633340713, 3283458626, 2540381572,
     1827832244, 2769720028, 1530668201, 3061401682, 3324975179, 1516317133, 3049472666, 1805091877,
@@ -75,46 +78,96 @@ void diffuse(u8 c[32], u8 d[32], u32 p[32])
     }
 }
 
-bool confuse(u8 input[32], u8 reuse[32], u8 current, u8 iterNum)
-{
-    if (current == 32)
-        return ConfuseAndDiffuse(reuse, iterNum + 1);
-    // return 1;
-    vector<u8> &options = confusioninv[input[current]];
-    if (options.size() == 0)
-        return 0;
-
-    for (auto i = options.begin(); i != options.end(); i++)
-    {
-        reuse[current] = *i;
-        if (confuse(input, reuse, current + 1, iterNum))
-            return 1;
-    }
-
-    return 0;
-}
-
-bool ConfuseAndDiffuse(u8 input[32], u8 iterNum)
+bool ConfuseAndDiffuse(u8 input[32], u32 iterNum)
 {
     if (iterNum == MAXITER)
+    {
+        for (u8 i = 0; i < 32; i++)
+            ip[i] = input[i];
         return 1;
+    }
     u8 c[32], reuse[32];
     diffuse(c, input, diffusioninv);
     return confuse(c, reuse, 0, iterNum);
 }
 
+bool confuse(u8 input[32], u8 reuse[32], u8 current, u32 iterNum)
+{
+    if (current == 32)
+        return ConfuseAndDiffuse(reuse, iterNum + 1);
+
+    vector<u8> &options = confusioninv[input[current]];
+
+    for (auto i = 0; i != options.size(); i++)
+    {
+        reuse[current] = options[i];
+        if (confuse(input, reuse, current + 1, iterNum))
+            return 1;
+    }
+    return 0;
+}
+
+bool revScramble()
+{
+    return 0;
+}
+
+//------------------------------------------------
+
 void Forward(u8 c[32], u8 d[32], u8 s[512], u32 p[32])
 {
-    for (u32 i = 0; i < 256; i++)
+    for (u32 i = 0; i < MAXITER; i++)
     {
         for (u8 j = 0; j < 32; j++)
-            d[j] = s[c[j]]; // invert the substitution network
+            d[j] = s[c[j]];
 
-        diffuse(c, d, p); // inverse of this step = diffuse(c,d,diffusioninv)
+        diffuse(c, d, p);
     }
     for (u8 i = 0; i < 16; i++)
-        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256]; // first reverse this
+        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256];
 }
+
+void test()
+{
+    u8 c[32] = {
+        0xf0, 0xd5, 0x4e, 0x28, 0x5f, 0xff, 0x6b, 0x5c, 0xac, 0x3b, 0x34, 0x14, 0xb5, 0x3c, 0xfa, 0xc6,
+        0xa4, 0x85, 0x1e, 0x0d, 0x86, 0xc7, 0x4f, 0xba, 0x75, 0x5e, 0xcb, 0xc3, 0x6e, 0x48, 0x99, 0x8c};
+
+    u8 d[32];
+
+    Forward(c, d, confusion, diffusion);
+
+    for (int i = 0; i < 32; i++)
+        cout << hex << int(c[i]) << " ";
+    cout << endl;
+
+    if (ConfuseAndDiffuse(c, 0))
+    {
+        Forward(ip, d, confusion, diffusion);
+        for (int i = 0; i < 32; i++)
+            cout << hex << int(ip[i]) << " ";
+        cout << endl;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    u8 target[] = "Hire me!!!!!!!!";
+    u8 output[32];
+    Forward(ip, output, confusion, diffusion);
+    cout << output << endl;
+    return memcmp(output, target, 16); // => contact jobs(at)nerd.nintendo.com
+}
+
+/*
+256 bit cipher
+
+{0,1}*256 -> {0,1}*256 
+does it have collisions?? -> YES, two different inputs can map to same outputs, so there exists atleat one 256 bit string that cannot be decoded.
+how to differentiate betwwen valid and invalid OPs??
+does the confusion map have a linear relation in terms of bits...?
+
+*/
 
 /*
 The solutions to this challenge belong to different levels :
@@ -134,24 +187,5 @@ Level 3 : an algorithm which can provide any of the 2^128 solutions (for any
 given output).
 
 Even fewer people have reached this final level. Congratulations to them!
-
-*/
-
-int main(int argc, char *argv[])
-{
-    u8 target[] = "Hire me!!!!!!!!";
-    u8 output[32];
-    Forward(ip, output, confusion, diffusion);
-    cout << output << endl;
-    return memcmp(output, target, 16); // => contact jobs(at)nerd.nintendo.com
-}
-
-/*
-256 bit cipher
-
-{0,1}*256 -> {0,1}*256 
-does it have collisions?? -> YES, two different inputs can map to same outputs, so there exists atleat one 256 bit string that cannot be decoded.
-how to differentiate betwwen valid and invalid OPs??
-does the confusion map have a linear relation in terms of bits...?
 
 */
