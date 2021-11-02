@@ -157,7 +157,6 @@ void Reverse(u8 input[16])
     bool t = scramble(input, op, 0);
     if (t)
     {
-        cout << "The Input is: ";
         for (u32 i = 0; i < 32; i++)
             cout << hex << u32(ip[i]) << " ";
         cout << endl;
