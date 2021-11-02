@@ -12,16 +12,16 @@ void Forward(u8 c[32], u8 d[32], u8 s[512], u32 p[32])
     {
         for (u8 j = 0; j < 32; j++)
         {
-            d[j] = s[c[j]];
+            d[j] = s[c[j]]; // confusion
             c[j] = 0;
         }
 
         for (u8 j = 0; j < 32; j++)
             for (u8 k = 0; k < 32; k++)
-                c[j] ^= d[k] * ((p[j] >> k) & 1);
+                c[j] ^= d[k] * ((p[j] >> k) & 1); // diffusion
     }
     for (u8 i = 0; i < 16; i++)
-        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256];
+        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256]; //scramble
 }
 ```
 <br>
@@ -57,7 +57,7 @@ g++ -o "HireMe"  Hire\ me\!\!\!\!\!\!\!\!.cpp
 5d c5 da 80 81 ad e e6 da 88 d9 67 43 63 1c 87 8b 72 60 24 4d bc d9 a7 fa 86 19 26 1e 69 3 6
 ```
 Correctness:
-for proof oc correntness, run
+for proof of correctness, run
 ```
 echo $?
 ```
