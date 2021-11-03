@@ -89,24 +89,31 @@ bitsInv = modMatInv(bits, 2)  # inverting array mod 2
 # for i in bitsInv:
 #     print(i.tolist())
 
+# proof of closure
 
 """
+2 3 6 7 8 9 c d
+this set is closed under 3XORs, hence any odd number of XORs by induction.
+
+
+
 BIT DECOMPOSITION OF DIFFUSION ARRAY:
 Observe the pattern, bits are repeating x = a | b then x + 16 =  b | a
 diffusion = [
-    0xf26cb481, 0x16a5dc92, 0x3c5ba924, 0x79b65248, 
-    0x2fc64b18, 0x615acd29, 0xc3b59a42, 0x976b2584,
-    0x6cf281b4, 0xa51692dc, 0x5b3c24a9, 0xb6794852, 
-    0xc62f184b, 0x5a6129cd, 0xb5c3429a, 0x6b978425,
+    only first four numbers derive rest of diffusion matrix??
+    0xf26cb481, 0x16a5dc92, 0x3c5ba924, 0x79b65248, -|
+    0x2fc64b18, 0x615acd29, 0xc3b59a42, 0x976b2584,  |- how do I use this repeating pattern?
+    0x6cf281b4, 0xa51692dc, 0x5b3c24a9, 0xb6794852,  |-
+    0xc62f184b, 0x5a6129cd, 0xb5c3429a, 0x6b978425, -|
     0xb481f26c, 0xdc9216a5, 0xa9243c5b, 0x524879b6, 
     0x4b182fc6, 0xcd29615a, 0x9a42c3b5, 0x2584976b,
     0x81b46cf2, 0x92dca516, 0x24a95b3c, 0x4852b679, 
     0x184bc62f, 0x29cd5a61, 0x429ab5c3, 0x84256b97]
 v-----------------------------v
 1 1 1 1 0 0 1 0 0 1 1 0 1 1 0 0 1 0 1 1 0 1 0 0 1 0 0 0 0 0 0 1
-0 0 0 1 0 1 1 0 1 0 1 0 0 1 0 1 1 1 0 1 1 1 0 0 1 0 0 1 0 0 1 0
-0 0 1 1 1 1 0 0 0 1 0 1 1 0 1 1 1 0 1 0 1 0 0 1 0 0 1 0 0 1 0 0
-0 1 1 1 1 0 0 1 1 0 1 1 0 1 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 0 0
+0 0 0 1 | 0 1 1 0 | 1 0 1 0 | 0 1 0 1 1 1 0 1 1 1 0 0 1 0 0 1 0 0 1 0
+0 0 1 1 | 1 1 0 0 | 0 1 0 1 | 1 0 1 1 1 0 1 0 1 0 0 1 0 0 1 0 0 1 0 0
+0 1 1 1 | 1 0 0 1 | 1 0 1 1 | 0 1 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 0 0
 
 0 0 1 0 1 1 1 1 1 1 0 0 0 1 1 0 0 1 0 0 1 0 1 1 0 0 0 1 1 0 0 0
 0 1 1 0 0 0 0 1 0 1 0 1 1 0 1 0 1 1 0 0 1 1 0 1 0 0 1 0 1 0 0 1
@@ -147,11 +154,34 @@ confusion1:
 0x80 0x9e 0xaf 0xb1 0xcb 0xd5 0xe4 0xfa
 
 // not allowed 
-f 1 0 e 4 a b 5
-2 c d 3 9 7 6 8 
-// allowed 
+s1 = f 1 0 e 4 a b 5 //this set is completely closed under XOR, this is completely absorbed by second set
+s2 = 2 3 6 7 8 9 c d
 
+We want s2 in the end to guarantee invertibility,
 
+principal rules:
+s1^s1 = s1
+s1^s2 = s2
+s2^s2 = s1
+
+if we guarantee exactly odd number of eles from s2 in every inverse diffuse, we are good to go , can we use symmetry of the transform??
+
+if we have a set = [......],
+under inverse diffuse operation,
+we get a 
+
+for (u32 i = 0; i < 256; i++)
+{
+        for (u8 j = 0; j < 32; j++)
+    ^    {
+    |        d[j] = s[c[j]];
+    |        c[j] = 0;
+    |    }
+    ^   // we want to guarantee inversion after inverse diffuse, all entries of d must belong to 0x_T, T is in s2 
+    |    for (u8 j = 0; j < 32; j++)
+    |        for (u8 k = 0; k < 32; k++)
+    |            c[j] ^= d[k] * ((p[j] >> k) & 1);
+}
  
 [1 0 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0 0 1 1 0 1 1 0 0 1 0 0 1 1 1 1]
 [0 1 0 0 1 0 0 1 0 0 1 1 1 0 1 1 1 0 1 0 0 1 0 1 0 1 1 0 1 0 0 0]
@@ -171,7 +201,7 @@ f 1 0 e 4 a b 5
 [1 0 1 1 0 0 1 1 1 0 0 1 0 1 0 0 1 0 0 0 0 1 1 0 0 1 0 1 1 0 1 0]
 [0 1 0 1 1 0 0 1 0 1 0 0 0 0 1 0 1 1 0 0 0 0 1 1 1 0 1 0 1 1 0 1]
 [1 0 1 0 0 1 0 0 0 0 1 0 0 0 0 1 1 1 1 0 1 0 0 1 1 1 0 1 0 1 1 0]
-
+ v------------------------------|------------------------------v
 [0 0 1 1 0 1 1 0 0 1 0 0 1 1 1 1 1 0 0 0 0 0 0 1 0 0 1 0 1 1 0 1]
 [1 0 1 0 0 1 0 1 0 1 1 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 1 1 0 1 1]
 [1 1 0 1 1 0 1 0 0 0 1 1 1 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 0 1 0 1]
