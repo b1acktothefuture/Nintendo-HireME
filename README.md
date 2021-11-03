@@ -80,17 +80,17 @@ for proof of correctness, run
 foo@bar:~$ echo $?
 0
 ```
-It prints '0' if there is an exact match
+It prints 0 if there is an exact match
 
 ## Faster Solution (Level 2)
-I have implemented a faster solution (<b>HireMeFast.cpp</b>) that runs in milliseconds, it finds <b>A</b> solution to the problem <b>not</b> all the possible solutions, it is based on finding as subset of [0,255] which is closed under both confusion and diffusion map, although I have not written down the solution/proof of work formally, some of my useful observations can be found in ```explore``` directory.
+I have implemented a faster solution (<b>HireMeFast.cpp</b>) that runs in milliseconds, it finds <b>a</b> solution to the problem <b>not</b> all the possible solutions, it is based on finding as subset of [0,255] which is closed under both confusion and diffusion map, although I have not written down the solution/proof of work formally, some of my useful observations can be found in ```explore``` directory.
 
 ### Compile and Run
 ```console
 foo@bar:~$ g++ -o "HireMeFast"  HireMeFast.cpp 
 foo@bar:~$ ./HireMeFast
 ```
-#### Output (Hex)
+#### Output
 
 ```
 Hire me!!!!!!!!
@@ -101,10 +101,10 @@ for proof of correctness, run
 foo@bar:~$ echo $?
 0
 ```
-It prints '0' if there is an exact match
+It prints 0 if there is an exact match
 
 ## Level 3??
-The Level two solution is very loose, in the sense are lot of the potential inputs are discarded, there is a great room for improvement especially with observed symmetries in diffusion map pointed out in <b>invert diffuse.py</b>. If anyone wishes to continue on this work, or improve upon current solution, you are welcome.
+The Level two solution is very loose, in the sense that a lot of the potential inputs are discarded, there is a great room for improvement especially with observed symmetries in diffusion map pointed out in <b>invert diffuse.py</b>. If anyone wishes to continue on this work, or improve upon current solution, you are welcome.
 
 
 
