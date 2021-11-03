@@ -175,7 +175,7 @@ void solution()
 
 int main(int argc, char *argv[])
 {
-    u8 target[16] = "Hire me!!!!!!!!";
+    u8 target[16] = "devil may cry!";
     u8 output[32] = {0};
     Reverse(target);
     Forward(ip, output, confusion, diffusion);

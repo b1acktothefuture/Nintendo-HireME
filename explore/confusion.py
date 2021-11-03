@@ -91,10 +91,23 @@ def anyRelations(t):
         print(bitfield(i), " : ", (confusion[i] >> t) & 1)
 
 
+def invalid():
+    firstHalf = [[] for _ in range(256)]
+    for i in range(256):
+        firstHalf[confusion[i]].append(i)
+    holes = []
+    for i in range(256):
+        if(len(firstHalf[i]) == 0):
+            holes.append(i)
+    for i in holes:
+        print(bitfield(i))
+
+
 # anyRelations(5)
 # analysis()
+invalid()
 
-reverseConfOne()
+# reverseConfOne()
 
 """
 bits of the outputs that repeat
@@ -117,6 +130,38 @@ BOX 1 [:256]
 [0, 0, 0, 1, 1, 0, 1, 1]  :  [1, 1, 1, 1, 0, 1, 1, 0] [1, 0, 1, 1, 0, 1, 1, 1]
 [1, 0, 0, 1, 0, 1, 1, 1]  :  [0, 0, 1, 0, 0, 1, 0, 0] [0, 0, 1, 1, 1, 1, 1, 0]
 [1, 1, 1, 0, 1, 1, 1, 1]  :  [0, 1, 0, 0, 0, 1, 1, 0] [0, 1, 1, 1, 1, 1, 1, 1]
+
+confusion1:
+0x0f 0x11 0x20 0x3e 0x44 0x5a 0x6b 0x75 
+0x80 0x9e 0xaf 0xb1 0xcb 0xd5 0xe4 0xfa
+
+// not allowed 
+f 1 0 e 4 a b 5
+2 c d 3 9 7 6 8 
+// allowed 
+diffusion = [
+    0xf26cb481, 0x16a5dc92, 0x3c5ba924, 0x79b65248, 0x2fc64b18, 0x615acd29, 0xc3b59a42, 0x976b2584,
+    0x6cf281b4, 0xa51692dc, 0x5b3c24a9, 0xb6794852, 0xc62f184b, 0x5a6129cd, 0xb5c3429a, 0x6b978425,
+    0xb481f26c, 0xdc9216a5, 0xa9243c5b, 0x524879b6, 0x4b182fc6, 0xcd29615a, 0x9a42c3b5, 0x2584976b,
+    0x81b46cf2, 0x92dca516, 0x24a95b3c, 0x4852b679, 0x184bc62f, 0x29cd5a61, 0x429ab5c3, 0x84256b97]
+
+[1, 1, 1, 1, 0, 0, 0, 0]
+[1, 0, 0, 0, 1, 0, 0, 0]
+[0, 0, 0, 0, 0, 1, 0, 0]
+[0, 1, 1, 1, 1, 1, 0, 0]
+[0, 0, 1, 0, 0, 0, 1, 0]
+[0, 1, 0, 1, 1, 0, 1, 0]
+[1, 1, 0, 1, 0, 1, 1, 0]
+[1, 0, 1, 0, 1, 1, 1, 0]
+
+[0, 0, 0, 0, 0, 0, 0, 1]
+[0, 1, 1, 1, 1, 0, 0, 1]
+[1, 1, 1, 1, 0, 1, 0, 1]
+[1, 0, 0, 0, 1, 1, 0, 1]
+[1, 1, 0, 1, 0, 0, 1, 1]
+[1, 0, 1, 0, 1, 0, 1, 1]
+[0, 0, 1, 0, 0, 1, 1, 1]
+[0, 1, 0, 1, 1, 1, 1, 1]
 
 <----------------->
 
