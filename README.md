@@ -32,16 +32,16 @@ void Forward(u8 c[32], u8 d[32], u8 s[512], u32 p[32])
     {
         for (u8 j = 0; j < 32; j++)
         {
-            d[j] = s[c[j]];
+            d[j] = s[c[j]]; // confusion
             c[j] = 0;
         }
 
         for (u8 j = 0; j < 32; j++)
             for (u8 k = 0; k < 32; k++)
-                c[j] ^= d[k] * ((p[j] >> k) & 1);
+                c[j] ^= d[k] * ((p[j] >> k) & 1); // diffusion
     }
     for (u8 i = 0; i < 16; i++)
-        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256];
+        d[i] = s[c[i * 2]] ^ s[c[i * 2 + 1] + 256]; //scramble
 }
 ```
 
@@ -96,7 +96,7 @@ foo@bar:~$ ./HireMeFast
 Hire me!!!!!!!!
 ```
 Correctness:
-for proof of correctness, run
+for proof of correctness, run 
 ```console
 foo@bar:~$ echo $?
 0
